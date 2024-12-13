@@ -11,32 +11,18 @@ import com.example.E_Commerce.repository.ReviewRepository;
 
 @Service
 public class ReviewService {
-   @Autowired
+    @Autowired
     private ReviewRepository reviewRepository;
-     
-    public List<Review> getAllReviews() {
-        return reviewRepository.findAll();
+
+    public void addReview(String productId, String userId, String comment,Float rating, String title) {
+        reviewRepository.save(Review.builder()
+                .productId(productId)
+                .userId(userId)
+                .comment(comment)
+                .rating(rating).title(title).build());
     }
 
-    public Optional<Review> getReviewById(String id) {
-        return reviewRepository.findById(id);
-    }
-
-    public Review createReview(Review review) {
-        return reviewRepository.save(review);
-    }
-
-    public Review updateReview(String id, Review reviewDetails) {
-        Review review = reviewRepository.findById(id).orElseThrow(() -> new RuntimeException("Review not found"));
-        review.setUserId(reviewDetails.getUserId());
-        review.setProductId(reviewDetails.getProductId());
-        review.setTitle(reviewDetails.getTitle());
-        review.setRating(reviewDetails.getRating());
-        review.setComment(reviewDetails.getComment());
-        return reviewRepository.save(review);
-    }
-
-    public void deleteReview(String id) {
-        reviewRepository.deleteById(id);
+    public List<Review> getReviewsByProductId(String productId) {
+        return reviewRepository.findByProductId(productId);
     }
 }
