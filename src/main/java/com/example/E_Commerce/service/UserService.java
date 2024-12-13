@@ -15,6 +15,7 @@ import com.example.E_Commerce.repository.UserRepository;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+   
     @Autowired
     private final UserRepository userRepository;
     @Autowired
@@ -43,21 +44,5 @@ public class UserService {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         return userRepository.save(user);
-    }
-
-    public void deleteUser(String userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new RuntimeException("User not found");
-        }
-        userRepository.deleteById(userId);
-    }
-
-    public User getUserById(String userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-    }
-
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
     }
 }
