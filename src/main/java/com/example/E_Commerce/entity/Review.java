@@ -20,6 +20,6 @@ public class Review {
     private String userId;
     private String productId;
     private String title;
-    private String rating;
+    private Float rating;
     private String comment;
 }
