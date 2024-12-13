@@ -16,8 +16,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()
-            .authorizeHttpRequests().anyRequest().permitAll(); // Allow all requests
+                .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless applications
+                .authorizeHttpRequests((requests) -> requests
+                        .anyRequest().permitAll() // Allow all requests
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Use stateless sessions for JWT
+                );
 
         return http.build();
     }
