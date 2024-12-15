@@ -11,11 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.E_Commerce.entity.Review;
 import com.example.E_Commerce.service.ReviewService;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/api/reviews")
+@CrossOrigin
 public class ReviewController {
     @Autowired
     private ReviewService reviewService;
