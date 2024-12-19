@@ -14,9 +14,18 @@ public class FlashSaleService {
 
     @Autowired
     private FlashSalesRepository flashSalesRepository;
+    
+    @Autowired
+    private ProductService productService;
 
     public FlashSales createFlashSale(FlashSales flashSale) {
-        return flashSalesRepository.save(flashSale);
+        FlashSales savedFlashSale = flashSalesRepository.save(flashSale);
+        updateProductDiscountedPrice(savedFlashSale);
+        return savedFlashSale;
+    }
+
+    private void updateProductDiscountedPrice(FlashSales flashSale) {
+        productService.updateDiscountedPrice(flashSale.getProductId(), flashSale.getDiscountedPrice());
     }
 
     public Optional<FlashSales> getFlashSaleById(String id) {
@@ -32,6 +41,10 @@ public class FlashSaleService {
     }
 
     public void deleteFlashSale(String id) {
-        flashSalesRepository.deleteById(id);
+        Optional<FlashSales> flashSale = flashSalesRepository.findById(id);
+        flashSale.ifPresent(sale -> {
+            flashSalesRepository.deleteById(id);
+            productService.resetDiscountedPrice(sale.getProductId());
+        });
     }
 }

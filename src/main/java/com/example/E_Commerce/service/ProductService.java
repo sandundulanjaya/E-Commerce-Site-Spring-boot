@@ -4,6 +4,7 @@ import com.example.E_Commerce.entity.FlashSales;
 import com.example.E_Commerce.entity.Product;
 import com.example.E_Commerce.repository.FlashSalesRepository;
 import com.example.E_Commerce.repository.ProductRepository;
+import com.example.E_Commerce.repository.SerachRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,6 +22,9 @@ public class ProductService {
    
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private SerachRepository searchRepository;
 
     @Autowired
     private FlashSalesRepository flashSalesRepository;
@@ -82,20 +86,41 @@ public class ProductService {
                         imageUrl3, imageUrl4, imageUrl5, rating));
     }
 
+    public void updateDiscountedPrice(String productId, BigDecimal discountedPrice) {
+        productRepository.findById(productId)
+                .ifPresentOrElse(product -> {
+                    product.setDiscountedPrice(discountedPrice);
+                    productRepository.save(product);
+                }, () -> {
+                    throw new RuntimeException("Product not found");
+                });
+    }
+
+    public void resetDiscountedPrice(String productId) {
+        productRepository.findById(productId)
+                .ifPresentOrElse(product -> {
+                    product.setDiscountedPrice(null);
+                    productRepository.save(product);
+                }, () -> {
+                    throw new RuntimeException("Product not found");
+                });
+    }
+
     public Product getProductById(String productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        // Check for active flash sales
         List<FlashSales> flashSales = flashSalesRepository.findByProductId(productId);
         Date now = new Date();
+        
+        // Reset to original price first
         product.setDiscountedPrice(product.getPrice());
-        for (FlashSales flashSale : flashSales) {
-            if (flashSale.getStartDate().before(now) && flashSale.getEndDate().after(now)) {
-                product.setDiscountedPrice(flashSale.getDiscountedPrice());
-                break;
-            }
-        }
+        
+        // Apply active flash sale discount if exists
+        flashSales.stream()
+                .filter(sale -> sale.getStartDate().before(now) && sale.getEndDate().after(now))
+                .findFirst()
+                .ifPresent(sale -> product.setDiscountedPrice(sale.getDiscountedPrice()));
 
         return product;
     }
@@ -106,5 +131,9 @@ public class ProductService {
 
     public List<Product> getAllProducts() {
         return productRepository.findAll();
+    }
+
+    public List<Product> findByText(String text) {
+        return searchRepository.findByText(text);
     }
 }

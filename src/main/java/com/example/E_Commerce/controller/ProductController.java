@@ -80,4 +80,9 @@ public class ProductController {
         List<Product> products = productService.getAllProducts();
         return ResponseEntity.ok(products);
     }
+
+    @GetMapping("/search/{text}")
+    public List<Product> searchProducts(@PathVariable String text) {
+        return productService.findByText(text);
+    }
 }
