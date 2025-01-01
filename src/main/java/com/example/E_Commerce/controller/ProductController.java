@@ -81,8 +81,9 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    @GetMapping("/search/{text}")
-    public List<Product> searchProducts(@PathVariable String text) {
-        return productService.findByText(text);
+    @GetMapping("/search/{name}")
+    public ResponseEntity<List<Product>> searchMovies(@PathVariable String name) {
+        List<Product> movies = productService.searchProductsByName(name);
+        return ResponseEntity.ok(movies);
     }
 }
