@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/api/products")
@@ -17,6 +20,7 @@ public class ProductController {
    
     @Autowired
     private ProductService productService;
+    
 
     @PutMapping("/{productId}")
     public ResponseEntity<String> updateProduct(
@@ -86,4 +90,7 @@ public class ProductController {
         List<Product> movies = productService.searchProductsByName(name);
         return ResponseEntity.ok(movies);
     }
+
+    
+    
 }

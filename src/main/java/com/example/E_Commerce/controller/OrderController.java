@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.E_Commerce.entity.Order;
 import com.example.E_Commerce.service.OrderService;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,5 +48,10 @@ public class OrderController {
     public ResponseEntity<Void> deleteOrder(@PathVariable String id) {
         orderService.deleteOrder(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/totalsales")
+    public BigDecimal getTotalSales() {
+        return orderService.getTotalSales();
     }
 }
