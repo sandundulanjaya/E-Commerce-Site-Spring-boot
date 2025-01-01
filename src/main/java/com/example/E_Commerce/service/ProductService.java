@@ -4,7 +4,7 @@ import com.example.E_Commerce.entity.FlashSales;
 import com.example.E_Commerce.entity.Product;
 import com.example.E_Commerce.repository.FlashSalesRepository;
 import com.example.E_Commerce.repository.ProductRepository;
-import com.example.E_Commerce.repository.SerachRepository;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,8 +23,6 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    @Autowired
-    private SerachRepository searchRepository;
 
     @Autowired
     private FlashSalesRepository flashSalesRepository;
@@ -133,7 +131,8 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    public List<Product> findByText(String text) {
-        return searchRepository.findByText(text);
+   
+    public List<Product> searchProductsByName(String name) {
+        return productRepository.findByNameContainingIgnoreCase(name);
     }
 }
