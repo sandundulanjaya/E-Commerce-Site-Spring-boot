@@ -1,19 +1,24 @@
 package com.example.E_Commerce.service;
 
 import com.example.E_Commerce.entity.FlashSales;
+import com.example.E_Commerce.entity.Order;
 import com.example.E_Commerce.entity.Product;
 import com.example.E_Commerce.repository.FlashSalesRepository;
+import com.example.E_Commerce.repository.OrderRepository;
 import com.example.E_Commerce.repository.ProductRepository;
 
 
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.aggregation.BooleanOperators.Or;
 import org.springframework.stereotype.Service;
 
+import java.lang.StackWalker.Option;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +31,8 @@ public class ProductService {
 
     @Autowired
     private FlashSalesRepository flashSalesRepository;
+
+    
 
     public void deleteProduct(String productId) {
         productRepository.deleteById(productId);
@@ -135,4 +142,6 @@ public class ProductService {
     public List<Product> searchProductsByName(String name) {
         return productRepository.findByNameContainingIgnoreCase(name);
     }
+
+    
 }

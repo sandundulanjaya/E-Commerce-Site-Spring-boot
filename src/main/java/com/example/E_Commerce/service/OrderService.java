@@ -71,4 +71,12 @@ public class OrderService {
             throw new RuntimeException("Order not found");
         }
     }
+
+    public BigDecimal getTotalSales() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream()
+                .filter(order -> order.getStatus().equals("COMPLETED"))
+                .map(Order::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 }
