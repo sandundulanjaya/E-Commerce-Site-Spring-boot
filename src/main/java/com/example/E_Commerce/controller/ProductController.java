@@ -23,26 +23,9 @@ public class ProductController {
     
 
     @PutMapping("/{productId}")
-    public ResponseEntity<String> updateProduct(
-            @PathVariable String productId,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String description,
-            @RequestParam(required = false) BigDecimal price,
-            @RequestParam(required = false) Integer quantityInStock,
-            @RequestParam(required = false) String imageUrl1,
-            @RequestParam(required = false) String imageUrl2,
-            @RequestParam(required = false) String imageUrl3,
-            @RequestParam(required = false) String imageUrl4,
-            @RequestParam(required = false) String imageUrl5,
-            @RequestParam(required = false) Float rating,
-            @RequestParam(required = false) String category) {
-
-        try {
-            productService.updateProduct(productId, name, description, price, quantityInStock, imageUrl1, imageUrl2, imageUrl3, imageUrl4, imageUrl5, rating ,category);
-            return ResponseEntity.ok("Product updated successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body("Product not found");
-        }
+    public ResponseEntity<Void> updateProduct(@PathVariable String productId, @RequestBody Product product) {
+        productService.updateProduct(productId, product);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{productId}")
@@ -90,6 +73,12 @@ public class ProductController {
         List<Product> movies = productService.searchProductsByName(name);
         return ResponseEntity.ok(movies);
     }
+
+    @GetMapping("/productcount")
+    public Integer getProductCount() {
+        return productService.getProductCount();
+    }
+    
 
     
     

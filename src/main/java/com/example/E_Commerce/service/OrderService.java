@@ -2,9 +2,11 @@ package com.example.E_Commerce.service;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.E_Commerce.entity.Order;
+import com.example.E_Commerce.entity.Product;
 import com.example.E_Commerce.repository.OrderRepository;
 import com.example.E_Commerce.repository.ProductRepository;
 
@@ -78,5 +80,14 @@ public class OrderService {
                 .filter(order -> order.getStatus().equals("COMPLETED"))
                 .map(Order::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public Integer getTotalOrders() {
+        List<Order> orders = orderRepository.findAll();
+        return (int) orders.stream().filter(order -> order.getStatus().equals("COMPLETED")).count();
+    }
+
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll(Sort.by(Sort.Direction.DESC, "orderDate"));
     }
 }
