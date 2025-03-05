@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.E_Commerce.entity.Order;
+import com.example.E_Commerce.entity.Product;
 import com.example.E_Commerce.service.OrderService;
 
 import java.math.BigDecimal;
@@ -53,5 +54,16 @@ public class OrderController {
     @GetMapping("/totalsales")
     public BigDecimal getTotalSales() {
         return orderService.getTotalSales();
+    }
+
+    @GetMapping("/totalorders")
+    public Integer getTotalOrders() {
+        return orderService.getTotalOrders();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Order>> getAllOrders() {
+        List<Order> orders = orderService.getAllOrders();
+        return ResponseEntity.ok(orders);
     }
 }

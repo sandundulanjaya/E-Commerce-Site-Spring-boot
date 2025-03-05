@@ -2,6 +2,7 @@ package com.example.E_Commerce.entity;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.stereotype.Indexed;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

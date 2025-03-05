@@ -1,12 +1,12 @@
 package com.example.E_Commerce.service;
 
+import com.algolia.api.SearchClient;
 import com.example.E_Commerce.entity.FlashSales;
 import com.example.E_Commerce.entity.Order;
 import com.example.E_Commerce.entity.Product;
 import com.example.E_Commerce.repository.FlashSalesRepository;
 import com.example.E_Commerce.repository.OrderRepository;
 import com.example.E_Commerce.repository.ProductRepository;
-
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.lang.StackWalker.Option;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,71 +25,73 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductService {
 
-   
     @Autowired
     private ProductRepository productRepository;
 
-
     @Autowired
     private FlashSalesRepository flashSalesRepository;
-
-    
 
     public void deleteProduct(String productId) {
         productRepository.deleteById(productId);
     }
 
-    public void updateProduct(String productId, String name, String description, BigDecimal price,
-            Integer quantityInStock, String imageUrl1, String imageUrl2, String imageUrl3, String imageUrl4,
-            String imageUrl5, Float rating, String category) {
+    public void updateProduct(String productId, Product product) {
         productRepository.findById(productId)
-                .ifPresentOrElse(product -> {
-                    if (name != null) {
-                        product.setName(name);
-                    }
-                    if (description != null) {
-                        product.setDescription(description);
-                    }
-                    if (price != null) {
-                        product.setPrice(price);
-                    }
-                    if (quantityInStock != null) {
-                        product.setQuantityInStock(quantityInStock);
-                    }
-                    if (imageUrl1 != null) {
-                        product.setImageUrl1(imageUrl1);
-                    }
-                    if (imageUrl2 != null) {
-                        product.setImageUrl2(imageUrl2);
-                    }
-                    if (imageUrl3 != null) {
-                        product.setImageUrl3(imageUrl3);
-                    }
-                    if (imageUrl4 != null) {
-                        product.setImageUrl4(imageUrl4);
-                    }
-                    if (imageUrl5 != null) {
-                        product.setImageUrl5(imageUrl5);
-                    }
-                    if (rating != null) {
-                        product.setRating(rating);
-                    }
-                    if (category != null) {
-                        product.setCategory(category);
-
-                    }
-
-                    productRepository.save(product);
+                .ifPresentOrElse(existingProduct -> {
+                    existingProduct.setName(product.getName());
+                    existingProduct.setDescription(product.getDescription());
+                    existingProduct.setPrice(product.getPrice());
+                    existingProduct.setDiscountedPrice(product.getDiscountedPrice());
+                    existingProduct.setQuantityInStock(product.getQuantityInStock());
+                    existingProduct.setCategory(product.getCategory());
+                    existingProduct.setImageUrl1(product.getImageUrl1());
+                    existingProduct.setImageUrl2(product.getImageUrl2());
+                    existingProduct.setImageUrl3(product.getImageUrl3());
+                    existingProduct.setImageUrl4(product.getImageUrl4());
+                    existingProduct.setImageUrl5(product.getImageUrl5());
+                    existingProduct.setRating(product.getRating());
+                    productRepository.save(existingProduct);
                 }, () -> {
                     throw new RuntimeException("Product not found");
                 });
     }
 
-    public void addProduct(String name, String description, BigDecimal price, BigDecimal discountedPrice ,Integer quantityInStock, String imageUrl1,
+    public void addProduct(String name, String description, BigDecimal price, BigDecimal discountedPrice,
+            Integer quantityInStock, String imageUrl1,
             String imageUrl2, String imageUrl3, String imageUrl4, String imageUrl5, Float rating, String category) {
-        productRepository
-                .save(new Product(null, name, description, price, discountedPrice, quantityInStock, category, imageUrl1, imageUrl2,
-                        imageUrl3, imageUrl4, imageUrl5, rating));
+        try {
+            Product product = new Product(null, name, description, price, discountedPrice, quantityInStock, category,
+                    imageUrl1, imageUrl2, imageUrl3, imageUrl4, imageUrl5, rating);
+            productRepository.save(product);
+
+            // Initialize the client
+            SearchClient client = new SearchClient("S9NOOSY4TW", "46c163e74cf52b7779f2c24c0adf5c26");
+
+            // Call the API
+            client.saveObject(
+                    "e-commerce.products",
+                    new HashMap() {
+                        {
+                            put("name", name);
+                            put("description", description);
+                            put("category", category);
+                            put("_id", new HashMap<String, String>() {{
+                                put("$oid", product.getId());
+                            }});
+                            put("price", price);
+                            put("quantityInStock", quantityInStock);
+                            put("imageUrl1", imageUrl1);
+                            put("imageUrl2", imageUrl2);
+                            put("imageUrl3", imageUrl3);
+                            put("imageUrl4", imageUrl4);
+                            put("rating", rating);
+                            
+                        }
+                    });
+        } catch (Exception e) {
+            throw new RuntimeException("Something went wrong while adding product!");
+        }
+
     }
 
     public void updateDiscountedPrice(String productId, BigDecimal discountedPrice) {
@@ -117,10 +120,10 @@ public class ProductService {
 
         List<FlashSales> flashSales = flashSalesRepository.findByProductId(productId);
         Date now = new Date();
-        
+
         // Reset to original price first
         product.setDiscountedPrice(product.getPrice());
-        
+
         // Apply active flash sale discount if exists
         flashSales.stream()
                 .filter(sale -> sale.getStartDate().before(now) && sale.getEndDate().after(now))
@@ -138,10 +141,12 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-   
     public List<Product> searchProductsByName(String name) {
         return productRepository.findByNameContainingIgnoreCase(name);
     }
 
-    
+    public Integer getProductCount() {
+        return (int) productRepository.count();
+    }
+
 }
