@@ -141,19 +141,27 @@ public class ProductService {
                 .findFirst()
                 .ifPresent(sale -> product.setDiscountedPrice(sale.getDiscountedPrice()));
 
+        // Return the product with the correct price
+        //product.setPrice(product.getDiscountedPrice() == null ? product.getPrice() : product.getDiscountedPrice());
         return product;
     }
 
     public List<Product> getProductsByCategory(String category) {
-        return productRepository.findByCategory(category);
+        List<Product> products = productRepository.findByCategory(category);
+        //products.forEach(product -> product.setPrice(product.getDiscountedPrice() == null ? product.getPrice() : product.getDiscountedPrice()));
+        return products;
     }
 
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        List<Product> products = productRepository.findAll();
+        //products.forEach(product -> product.setPrice(product.getDiscountedPrice() == null ? product.getPrice() : product.getDiscountedPrice()));
+        return products;
     }
 
     public List<Product> searchProductsByName(String name) {
-        return productRepository.findByNameContainingIgnoreCase(name);
+        List<Product> products = productRepository.findByNameContainingIgnoreCase(name);
+        //products.forEach(product -> product.setPrice(product.getDiscountedPrice() == null ? product.getPrice() : product.getDiscountedPrice()));
+        return products;
     }
 
     public Integer getProductCount() {
