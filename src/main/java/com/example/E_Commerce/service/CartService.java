@@ -6,9 +6,11 @@ import com.example.E_Commerce.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -100,10 +102,23 @@ public class CartService {
     }
 
     private void updateTotalPrice(Cart cart) {
-        double totalPrice = cart.getProductQuantities().entrySet().stream()
-                .map(entry -> productRepository.findById(entry.getKey()).orElseThrow(() -> new RuntimeException("Product not found")))
-                .mapToDouble(product -> product.getPrice().doubleValue() * cart.getProductQuantities().get(product.getId()))
-                .sum();
-        cart.setTotalPrice(totalPrice);
+        cart.setTotalPrice(calculateCartTotal(cart).doubleValue());
+    }
+
+    public BigDecimal calculateCartTotal(Cart cart) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (Map.Entry<String, Integer> entry : cart.getProductQuantities().entrySet()) {
+            String productId = entry.getKey();
+            Integer quantity = entry.getValue();
+            BigDecimal productPrice = getProductPriceById(productId);
+            total = total.add(productPrice.multiply(BigDecimal.valueOf(quantity)));
+        }
+        return total;
+    }
+
+    private BigDecimal getProductPriceById(String productId) {
+        return productRepository.findById(productId)
+                .map(product -> product.getDiscountedPrice() == null ? product.getPrice() : product.getDiscountedPrice())
+                .orElse(BigDecimal.ZERO);
     }
 }

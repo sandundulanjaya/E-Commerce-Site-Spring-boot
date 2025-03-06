@@ -31,7 +31,19 @@ public class OrderService {
         BigDecimal totalPrice = calculateTotalPrice(order);
         order.setTotalPrice(totalPrice);
         orderRepository.save(order);
+        updateProductStock(order);
         return order.getId();
+    }
+
+    private void updateProductStock(Order order) {
+        for (Map.Entry<String, Integer> entry : order.getProductQuantities().entrySet()) {
+            String productId = entry.getKey();
+            Integer quantity = entry.getValue();
+            productRepository.findById(productId).ifPresent(product -> {
+                product.setQuantityInStock(product.getQuantityInStock() - quantity);
+                productRepository.save(product);
+            });
+        }
     }
 
     private BigDecimal calculateTotalPrice(Order order) {
@@ -47,7 +59,7 @@ public class OrderService {
 
     private BigDecimal getProductPriceById(String productId) {
         return productRepository.findById(productId)
-                .map(product -> product.getPrice())
+                .map(product -> product.getDiscountedPrice() == null ? product.getPrice() : product.getDiscountedPrice())
                 .orElse(BigDecimal.ZERO);
     }
 

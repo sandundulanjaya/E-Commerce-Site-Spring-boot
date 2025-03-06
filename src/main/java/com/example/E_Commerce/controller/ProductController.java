@@ -32,6 +32,7 @@ public class ProductController {
     public ResponseEntity<Product> getProductById(@PathVariable String productId) {
         try {
             Product product = productService.getProductById(productId);
+            //product.setPrice(product.getDiscountedPrice() == null ? product.getPrice() : product.getDiscountedPrice());
             return ResponseEntity.ok(product);
         } catch (RuntimeException e) {
             return ResponseEntity.status(404).body(null);
