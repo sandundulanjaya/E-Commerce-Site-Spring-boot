@@ -27,7 +27,7 @@ public class OrderService {
 
     public String createOrder(Order order) {
         order.setOrderDate(new Date());
-        order.setStatus("PENDING");
+        order.setStatus("PROCESSING");
         BigDecimal totalPrice = calculateTotalPrice(order);
         order.setTotalPrice(totalPrice);
         orderRepository.save(order);
