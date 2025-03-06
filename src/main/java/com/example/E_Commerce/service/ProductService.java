@@ -1,6 +1,7 @@
 package com.example.E_Commerce.service;
 
 import com.algolia.api.SearchClient;
+import com.algolia.model.search.DeleteByParams;
 import com.example.E_Commerce.entity.FlashSales;
 import com.example.E_Commerce.entity.Order;
 import com.example.E_Commerce.entity.Product;
@@ -33,6 +34,14 @@ public class ProductService {
 
     public void deleteProduct(String productId) {
         productRepository.deleteById(productId);
+
+        // Initialize the client
+        SearchClient client = new SearchClient("S9NOOSY4TW", "46c163e74cf52b7779f2c24c0adf5c26");
+
+        // Call the API
+        client.deleteBy("e-commerce.products", new DeleteByParams().setFilters("_id:{$oid: "+productId+"}"));
+        // >LOG
+
     }
 
     public void updateProduct(String productId, Product product) {
@@ -75,9 +84,11 @@ public class ProductService {
                             put("name", name);
                             put("description", description);
                             put("category", category);
-                            put("_id", new HashMap<String, String>() {{
-                                put("$oid", product.getId());
-                            }});
+                            put("_id", new HashMap<String, String>() {
+                                {
+                                    put("$oid", product.getId());
+                                }
+                            });
                             put("price", price);
                             put("quantityInStock", quantityInStock);
                             put("imageUrl1", imageUrl1);
@@ -85,7 +96,7 @@ public class ProductService {
                             put("imageUrl3", imageUrl3);
                             put("imageUrl4", imageUrl4);
                             put("rating", rating);
-                            
+
                         }
                     });
         } catch (Exception e) {
